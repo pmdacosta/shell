@@ -4,7 +4,7 @@
 # Adapted to english
 #
 # Shows the usernames and their full name on the system
-# Obs.: Reads from /etc
+# Obs.: Reads from /etc/passwd
 #
 # v1: Show system username and full names separated by TAB.
 # v2: Add support for -h option.
