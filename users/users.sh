@@ -16,6 +16,7 @@
 # v6: Add support for -r, --reverse, -u, --uppercase options,
 #     and support reading multiple options. Renamed sort to
 #     sorted to avoid conflict with the sort program.
+# v7: Add support for -d, --delimiter options
 #
 # Pedro, August 2025
 #
@@ -24,11 +25,12 @@ BASENAME="$(basename $0)"
 USAGE_MSG="Usage: $BASENAME [OPTIONS]"
 HELP_MSG="$USAGE_MSG
 
-  -h, --help        Shows help message
-  -r, --reverse     Show in reverse order
-  -s, --sort        Sort list
-  -u, --uppercase   Show list in uppercase
-  -V, --version     Show version
+  -d, --delimiter C     Change default delimiter to C
+  -h, --help            Shows help message
+  -r, --reverse         Show in reverse order
+  -s, --sort            Sort list
+  -u, --uppercase       Show list in uppercase
+  -V, --version         Show version
 "
 INVALID_OPTION_MSG="$0: Invalid option: $1
 Try '$0 -h' for more information."
@@ -37,7 +39,7 @@ Try '$0 -h' for more information."
 sorted=0      # sort output?
 revert=0      # revert output order?
 uppercase=0   # print uppercase output?
-
+delim='\t'    # delimiter character
 # Process command line options
 while test -n "$1"
 do
@@ -46,6 +48,16 @@ do
         -r | --reverse) revert=1 ;;
         -s | --sort) sorted=1 ;;
         -u | --uppercase) uppercase=1 ;;
+        -d | --delimiter)
+            shift
+            delim="$1"
+
+            if test -z "$1"
+            then
+                echo "$BASENAME: missing delimiter for -d"
+                exit 1
+            fi
+            ;;
         -h | --help)
             echo "$HELP_MSG"
             exit 0
@@ -76,5 +88,5 @@ test "$revert" = 1 && list=$(echo "$list" | tac)            # reverse order
 test "$uppercase" = 1 && list=$(echo "$list" | tr a-z A-Z)  # convert to uppercase
 
 # Print result
-echo "$list" | tr : \\t
+echo "$list" | tr : "$delim"
 
