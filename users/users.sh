@@ -12,6 +12,7 @@
 # v4: Fix bug when no option is passed, add basename instead
 #     of $0 for the program name, -V extracts from header,
 #     add options for --help and --version.
+# v5: Add support for -s, --sort option.
 #
 # Pedro, August 2025
 #
@@ -21,10 +22,14 @@ USAGE_MSG="Usage: $BASENAME [OPTION]"
 HELP_MSG="$USAGE_MSG
 
   -h, --help        Shows help message
+  -s, --sort        Sort list
   -V, --version     Show version
 "
 INVALID_OPTION_MSG="$0: Invalid option: $1
 Try '$0 -h' for more information."
+
+# FLAGS
+sort=0      # sort output?
 
 # Process command line options
 case "$1" in
@@ -38,6 +43,9 @@ case "$1" in
         echo "$BASENAME $VERSION"
         exit 0
         ;;
+    -s | --sort)
+        sort=1
+        ;;
     *)
         # -n option tests if the length of the string is non zero
         if test -n "$1"
@@ -48,6 +56,15 @@ case "$1" in
         ;;
 esac
 
-# Process
-cut -d : -f1,5 /etc/passwd | tr : \\t
+# Extract listing
+list=$(cut -d : -f1,5 /etc/passwd)
+
+# Order listing (if enabled)
+if test "$sort" = 1
+then
+    list=$(echo "$list" | sort)
+fi
+
+# Print result
+echo "$list" | tr : \\t
 
