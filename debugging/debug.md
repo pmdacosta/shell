@@ -88,3 +88,5 @@ $ bash -x five.sh
 You can also use `bash -xv` to have both at the same time.
 
 ### Debug section only
+
+`set -x` turns on
