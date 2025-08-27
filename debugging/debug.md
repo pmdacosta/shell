@@ -89,4 +89,76 @@ You can also use `bash -xv` to have both at the same time.
 
 ### Debug section only
 
-`set -x` turns on
+`set -x` turns on debbuging
+`set +x` turns off debbuging
+`set -v` turns on verbose mode
+`set +v` turns off verbose mode
+
+You can set these in the middle or your script to turn on and off in the parts you want
+to debug instead of having it turned on the whole script.
+
+### Breakpoints with `trap`
+
+You can set `trap read DEBUG` in your code so the code stops and waits for execution
+until you press enter. You can then set `trap "" DEBUG` in the line you want the step by
+step execution to stop. You can mix this with the `-vx` modes to get debbuging output.
+Like so:
+
+```bash
+#!/bin/bash
+# five.sh
+#
+# Count until five
+
+echo $((0+1))
+set -x
+trap read DEBUG
+echo $((0+2))
+echo $((0+3))
+trap "" DEBUG
+set +x
+echo $((0+4))
+echo $((0+5))
+```
+
+### Custom `debug()` function
+
+Since adding comments to turn on and off debbuging `echo`s starts to become annoying, you can
+use a custom `debug()` function and a `DEBUG` flag to turn it on and off.
+
+```bash
+debug(){
+    [ "$DEBUG" = 1 ] && echo "$*"
+}
+```
+
+This will only print if `DEBUG` is set to `1`.
+Like so:
+
+```bash
+#!/bin/bash
+# scream.sh
+# Based on Aurelio Vargas's grita.sh from the Shell Script Profissional Book
+# Adapted to english
+#
+# Shows a word ($TXT) in uppercase and with exclamation marks
+# Example: foo -> !!!!!FOO!!!!!
+#
+
+DEBUG=1
+
+debug() {
+    [ "$DEBUG" = 1 ] && echo -e "{DEBUG}: $*"
+}
+
+TXT="scream"
+TXT="     $TXT     "            # Adds 5 spaces around
+
+debug "TXT with whitespaces   : [$TXT]"
+TXT=$(echo $TXT | tr ' ' '!')   # Switch spaces for exclamation marks
+debug "TXT with exclamation   : [$TXT]"
+
+TXT=$(echo $TXT | tr a-z A-Z)   # Change text to uppercase
+echo "$TXT"
+```
+
